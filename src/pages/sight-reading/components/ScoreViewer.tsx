@@ -1,5 +1,7 @@
 import type { OpenSheetMusicDisplay as OSMD } from "opensheetmusicdisplay";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 type ScoreViewerProps =
 	| { xml: string; fileUrl?: never }
@@ -10,8 +12,15 @@ type LoadState = "idle" | "loading" | "ready" | "error";
 const ScoreViewer = ({ xml, fileUrl }: ScoreViewerProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const osmdRef = useRef<OSMD | null>(null);
-	const [state, setState] = useState<LoadState>("idle");
+	const [state, setState] = useState<LoadState>("loading");
+	const [attempt, setAttempt] = useState(0);
 
+	const retry = useCallback(() => {
+		osmdRef.current = null;
+		setAttempt((n) => n + 1);
+	}, []);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` is a retrigger counter, not a value consumed inside the effect
 	useEffect(() => {
 		if (!containerRef.current) return;
 
@@ -45,23 +54,22 @@ const ScoreViewer = ({ xml, fileUrl }: ScoreViewerProps) => {
 		return () => {
 			cancelled = true;
 		};
-	}, [xml, fileUrl]);
+	}, [xml, fileUrl, attempt]);
 
 	return (
 		<div className="relative w-full">
 			{state === "loading" && (
-				<div className="absolute inset-0 flex items-center justify-center gap-2 py-12 text-sm text-[var(--sea-ink-soft)]">
-					<span
-						className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--lagoon)] border-t-transparent"
-						aria-hidden
-					/>
-					Loading score…
+				<div className="flex items-center justify-center py-16">
+					<Spinner className="size-6" />
 				</div>
 			)}
 			{state === "error" && (
-				<p className="py-6 text-center text-sm text-red-500">
-					Failed to load score.
-				</p>
+				<div className="flex flex-col items-center justify-center gap-3 py-16">
+					<p className="text-sm text-destructive">Failed to load score.</p>
+					<Button variant="outline" size="sm" onClick={retry}>
+						Try again
+					</Button>
+				</div>
 			)}
 			<div
 				ref={containerRef}
