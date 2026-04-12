@@ -7,6 +7,26 @@ const navItems = [
 		to: "/",
 	},
 	{
+		label: "Ear Training",
+		to: "/ear-training",
+	},
+	{
+		label: "Scales",
+		to: "/scales",
+	},
+	{
+		label: "Chords",
+		to: "/chords",
+	},
+	{
+		label: "Sight Reading",
+		to: "/sight-reading",
+	},
+	{
+		label: "Rythm",
+		to: "/rythm",
+	},
+	{
 		label: "About",
 		to: "/about",
 	},

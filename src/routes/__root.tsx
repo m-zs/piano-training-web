@@ -1,8 +1,8 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Header } from "../components/common/Header/Header";
 import Footer from "../components/Footer";
-import { Header } from "../components/Header";
 
 import appCss from "../styles.css?url";
 
