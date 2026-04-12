@@ -9,6 +9,9 @@ import { defineConfig } from "vite";
 const config = defineConfig({
 	resolve: { tsconfigPaths: true },
 	plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+	optimizeDeps: {
+		include: ["opensheetmusicdisplay"],
+	},
 });
 
 export default config;
