@@ -10,9 +10,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "format": "biome format",
+    "format": "biome format --write .",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "fix": "biome check --write ."
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
