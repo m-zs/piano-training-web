@@ -1,58 +1,18 @@
-import type { OpenSheetMusicDisplay as OSMD } from "opensheetmusicdisplay";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useScoreViewer } from "./useScoreViewer";
 
 type ScoreViewerProps =
-	| { xml: string; fileUrl?: never }
-	| { fileUrl: string; xml?: never };
+	| { xml: string; fileUrl?: never; buffer?: never }
+	| { fileUrl: string; xml?: never; buffer?: never }
+	| { buffer: ArrayBuffer; xml?: never; fileUrl?: never };
 
-type LoadState = "idle" | "loading" | "ready" | "error";
-
-const ScoreViewer = ({ xml, fileUrl }: ScoreViewerProps) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-	const osmdRef = useRef<OSMD | null>(null);
-	const [state, setState] = useState<LoadState>("loading");
-	const [attempt, setAttempt] = useState(0);
-
-	const retry = useCallback(() => {
-		osmdRef.current = null;
-		setAttempt((n) => n + 1);
-	}, []);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` is a retrigger counter, not a value consumed inside the effect
-	useEffect(() => {
-		if (!containerRef.current) return;
-
-		let cancelled = false;
-		setState("loading");
-
-		const run = async () => {
-			const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
-			if (cancelled || !containerRef.current) return;
-
-			osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
-				autoResize: true,
-				backend: "svg",
-			});
-
-			try {
-				await osmdRef.current.load(xml ?? fileUrl ?? "");
-				if (cancelled) return;
-				osmdRef.current.render();
-				setState("ready");
-			} catch (err) {
-				if (!cancelled) setState("error");
-				console.error("OSMD render error:", err);
-			}
-		};
-
-		run();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [xml, fileUrl, attempt]);
+const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
+	const { containerRef, state, retry } = useScoreViewer({
+		xml,
+		fileUrl,
+		buffer,
+	});
 
 	return (
 		<div className="relative w-full">
