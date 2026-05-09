@@ -31,12 +31,10 @@ const ScoreViewer = ({ xml, fileUrl }: ScoreViewerProps) => {
 			const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
 			if (cancelled || !containerRef.current) return;
 
-			if (!osmdRef.current) {
-				osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
-					autoResize: true,
-					backend: "svg",
-				});
-			}
+			osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
+				autoResize: true,
+				backend: "svg",
+			});
 
 			try {
 				await osmdRef.current.load(xml ?? fileUrl ?? "");
