@@ -34,9 +34,13 @@ export default defineConfig(({ mode }) => {
 				? ["react", "react-dom", "@testing-library/react"]
 				: ["opensheetmusicdisplay"],
 		},
-		ssr: {
-			noExternal: ["react", "react-dom", "@testing-library/react"],
-		},
+		...(isVitest
+			? {
+					ssr: {
+						noExternal: ["react", "react-dom", "@testing-library/react"],
+					},
+				}
+			: {}),
 		test: {
 			environment: "jsdom",
 			setupFiles: ["./vitest.setup.ts"],
