@@ -9,7 +9,8 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest watch",
     "format": "biome format --write .",
     "lint": "biome lint",
     "check": "biome check",
@@ -59,7 +60,8 @@
   },
   "lint-staged": {
     "*": [
-      "biome check --write --files-ignore-unknown=true --no-errors-on-unmatched"
+      "biome check --write --files-ignore-unknown=true --no-errors-on-unmatched",
+      "npm run test"
     ]
   },
   "pnpm": {
