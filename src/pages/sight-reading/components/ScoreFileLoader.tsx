@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -16,20 +16,36 @@ type ScoreFileLoaderProps = {
 };
 
 const ScoreFileLoader = ({ fileName, onLoad }: ScoreFileLoaderProps) => {
+	const [error, setError] = useState<Error | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
-		if (file.name.endsWith(".mxl")) {
-			onLoad({ buffer: await file.arrayBuffer() }, file.name);
-		} else {
-			onLoad({ xml: await file.text() }, file.name);
+		try {
+			setError(null);
+			const file = e.target.files?.[0];
+			if (!file) return;
+			if (file.name.endsWith(".mxl")) {
+				onLoad({ buffer: await file.arrayBuffer() }, file.name);
+			} else {
+				onLoad({ xml: await file.text() }, file.name);
+			}
+		} catch (error) {
+			setError(error as Error);
 		}
 	};
 
 	return (
-		<div className="mb-6 flex items-center gap-3">
+		<div className="mb-6 flex flex-col items-center gap-3">
+			{error && (
+				<p
+					className="text-sm text-destructive"
+					aria-live="assertive"
+					role="alert"
+				>
+					{error.message}
+				</p>
+			)}
+
 			<Button
 				variant="outline"
 				className="cursor-pointer"
