@@ -1,4 +1,7 @@
-import type { OpenSheetMusicDisplay as OSMD } from "opensheetmusicdisplay";
+import type {
+	IOSMDOptions,
+	OpenSheetMusicDisplay as OSMD,
+} from "opensheetmusicdisplay";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type LoadState = "idle" | "loading" | "ready" | "error";
@@ -7,6 +10,11 @@ type UseScoreViewerArgs = {
 	xml?: string;
 	fileUrl?: string;
 	buffer?: ArrayBuffer;
+};
+
+export const IOSMD_OPTIONS: IOSMDOptions = {
+	autoResize: true,
+	backend: "svg",
 };
 
 export const useScoreViewer = ({
@@ -35,10 +43,10 @@ export const useScoreViewer = ({
 			const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
 			if (cancelled || !containerRef.current) return;
 
-			osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
-				autoResize: true,
-				backend: "svg",
-			});
+			osmdRef.current ??= new OpenSheetMusicDisplay(
+				containerRef.current,
+				IOSMD_OPTIONS,
+			);
 
 			try {
 				const content = xml ?? fileUrl ?? (buffer ? new Blob([buffer]) : "");
