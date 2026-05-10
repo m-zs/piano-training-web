@@ -6,12 +6,31 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-const config = defineConfig({
-	resolve: { tsconfigPaths: true },
-	plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
-	optimizeDeps: {
-		include: ["opensheetmusicdisplay"],
-	},
-});
+export default defineConfig(({ mode }) => {
+	const isVitest =
+		mode === "test" ||
+		process.env.VITEST === "true" ||
+		process.env.VITEST === "1";
 
-export default config;
+	return {
+		resolve: {
+			tsconfigPaths: true,
+			dedupe: ["react", "react-dom"],
+		},
+		plugins: isVitest
+			? [viteReact()]
+			: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+		optimizeDeps: {
+			include: isVitest
+				? ["react", "react-dom", "@testing-library/react"]
+				: ["opensheetmusicdisplay"],
+		},
+		ssr: {
+			noExternal: ["react", "react-dom", "@testing-library/react"],
+		},
+		test: {
+			environment: "jsdom",
+			setupFiles: ["./vitest.setup.ts"],
+		},
+	};
+});
