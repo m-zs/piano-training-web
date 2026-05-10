@@ -17,6 +17,13 @@ export const IOSMD_OPTIONS: IOSMDOptions = {
 	backend: "svg",
 };
 
+export const SCORE_VIEWER_LOAD_STATE = {
+	IDLE: "idle",
+	LOADING: "loading",
+	READY: "ready",
+	ERROR: "error",
+} as const;
+
 export const useScoreViewer = ({
 	xml,
 	fileUrl,
@@ -24,7 +31,9 @@ export const useScoreViewer = ({
 }: UseScoreViewerArgs) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const osmdRef = useRef<OSMD | null>(null);
-	const [state, setState] = useState<LoadState>("loading");
+	const [state, setState] = useState<LoadState>(
+		SCORE_VIEWER_LOAD_STATE.LOADING,
+	);
 	const [attempt, setAttempt] = useState(0);
 
 	const retry = useCallback(() => {
@@ -37,7 +46,7 @@ export const useScoreViewer = ({
 		if (!containerRef.current) return;
 
 		let cancelled = false;
-		setState("loading");
+		setState(SCORE_VIEWER_LOAD_STATE.LOADING);
 
 		const run = async () => {
 			const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
@@ -53,9 +62,9 @@ export const useScoreViewer = ({
 				await osmdRef.current.load(content);
 				if (cancelled) return;
 				osmdRef.current.render();
-				setState("ready");
+				setState(SCORE_VIEWER_LOAD_STATE.READY);
 			} catch (err) {
-				if (!cancelled) setState("error");
+				if (!cancelled) setState(SCORE_VIEWER_LOAD_STATE.ERROR);
 				console.error("OSMD render error:", err);
 			}
 		};
