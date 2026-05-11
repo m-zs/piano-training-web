@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { PlaybackBar } from "./PlaybackBar";
@@ -23,7 +24,7 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 	const ready = state === SCORE_VIEWER_LOAD_STATE.READY;
 
 	return (
-		<div className="relative w-full pb-20">
+		<div className="w-full pb-20">
 			{state === SCORE_VIEWER_LOAD_STATE.LOADING && (
 				<div className="flex items-center justify-center py-16">
 					<Spinner className="size-6" />
@@ -49,14 +50,17 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 						: "osmd-score invisible h-0 overflow-hidden"
 				}
 			/>
-			<PlaybackBar
-				isPlaying={isPlaying}
-				ready={ready}
-				bpm={bpm}
-				onPlay={() => void play()}
-				onStop={stop}
-				onBpmChange={setBpmState}
-			/>
+			{createPortal(
+				<PlaybackBar
+					isPlaying={isPlaying}
+					ready={ready}
+					bpm={bpm}
+					onPlay={() => void play()}
+					onStop={stop}
+					onBpmChange={setBpmState}
+				/>,
+				document.body,
+			)}
 		</div>
 	);
 };

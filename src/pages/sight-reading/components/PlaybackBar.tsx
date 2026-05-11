@@ -31,7 +31,7 @@ export const PlaybackBar = ({
 						type="button"
 						size="icon"
 						variant="ghost"
-						className="size-9 rounded-xl"
+						className="size-9 rounded-xl cursor-pointer"
 						disabled={!ready || isPlaying}
 						onClick={onPlay}
 						aria-label="Play"
@@ -42,7 +42,7 @@ export const PlaybackBar = ({
 						type="button"
 						size="icon"
 						variant="ghost"
-						className="size-9 rounded-xl"
+						className="size-9 rounded-xl cursor-pointer"
 						disabled={!isPlaying}
 						onClick={onStop}
 						aria-label="Stop"
@@ -59,21 +59,21 @@ export const PlaybackBar = ({
 						type="button"
 						size="icon"
 						variant="ghost"
-						className="size-7 rounded-lg"
+						className="size-7 rounded-lg cursor-pointer"
 						onClick={() => nudge(-5)}
 						aria-label="Decrease BPM"
 					>
 						<Minus className="size-3" />
 					</Button>
 
-					<div className="flex flex-col items-center gap-0.5">
+					<div className="flex flex-col items-center gap-1.5 mt-5">
 						<input
 							type="range"
 							min={BPM_MIN}
 							max={BPM_MAX}
 							value={bpm}
 							onChange={(e) => onBpmChange(Number(e.target.value))}
-							className="bpm-slider w-28"
+							className="bpm-slider w-28 cursor-pointer"
 							style={
 								{
 									"--bpm-pct": (
@@ -93,7 +93,7 @@ export const PlaybackBar = ({
 						type="button"
 						size="icon"
 						variant="ghost"
-						className="size-7 rounded-lg"
+						className="size-7 rounded-lg cursor-pointer"
 						onClick={() => nudge(5)}
 						aria-label="Increase BPM"
 					>
