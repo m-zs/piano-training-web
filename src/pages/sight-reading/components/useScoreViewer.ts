@@ -15,6 +15,16 @@ type UseScoreViewerArgs = {
 export const IOSMD_OPTIONS: IOSMDOptions = {
 	autoResize: true,
 	backend: "svg",
+	followCursor: true,
+	disableCursor: false,
+	cursorsOptions: [
+		{
+			type: 1,
+			color: "#0284c7",
+			alpha: 0.92,
+			follow: true,
+		},
+	],
 };
 
 export const SCORE_VIEWER_LOAD_STATE = {
@@ -76,5 +86,5 @@ export const useScoreViewer = ({
 		};
 	}, [xml, fileUrl, buffer, attempt]);
 
-	return { containerRef, state, retry };
+	return { containerRef, state, retry, osmdRef };
 };

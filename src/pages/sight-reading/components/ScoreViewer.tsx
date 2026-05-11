@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useScorePlayer } from "./useScorePlayer";
 import { SCORE_VIEWER_LOAD_STATE, useScoreViewer } from "./useScoreViewer";
 
 export type ScoreViewerProps =
@@ -8,14 +9,40 @@ export type ScoreViewerProps =
 	| { buffer: ArrayBuffer; xml?: never; fileUrl?: never };
 
 const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
-	const { containerRef, state, retry } = useScoreViewer({
+	const { containerRef, state, retry, osmdRef } = useScoreViewer({
 		xml,
 		fileUrl,
 		buffer,
 	});
+	const { play, stop, isPlaying } = useScorePlayer({
+		state,
+		osmdRef,
+		containerRef,
+	});
+	const ready = state === SCORE_VIEWER_LOAD_STATE.READY;
 
 	return (
 		<div className="relative w-full">
+			<div className="absolute right-0 top-0 z-10 flex gap-1">
+				<Button
+					type="button"
+					variant="secondary"
+					size="sm"
+					disabled={!ready || isPlaying}
+					onClick={() => void play()}
+				>
+					Play
+				</Button>
+				<Button
+					type="button"
+					variant="ghost"
+					size="sm"
+					disabled={!isPlaying}
+					onClick={stop}
+				>
+					Stop
+				</Button>
+			</div>
 			{state === SCORE_VIEWER_LOAD_STATE.LOADING && (
 				<div className="flex items-center justify-center py-16">
 					<Spinner className="size-6" />
@@ -36,7 +63,9 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 			<div
 				ref={containerRef}
 				className={
-					state === "ready" ? "w-full" : "invisible h-0 overflow-hidden"
+					state === SCORE_VIEWER_LOAD_STATE.READY
+						? "osmd-score relative w-full"
+						: "osmd-score invisible h-0 overflow-hidden"
 				}
 			/>
 		</div>
