@@ -12,6 +12,12 @@ type UseScorePlayerArgs = {
 	containerRef: RefObject<HTMLDivElement | null>;
 };
 
+const BPM_DEFAULT = 120;
+const BPM_MIN = 40;
+const BPM_MAX = 240;
+
+export { BPM_DEFAULT, BPM_MIN, BPM_MAX };
+
 export const useScorePlayer = ({
 	state,
 	osmdRef,
@@ -19,6 +25,13 @@ export const useScorePlayer = ({
 }: UseScorePlayerArgs) => {
 	const synthRef = useRef<Tone.PolySynth | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
+	const [bpm, setBpm] = useState(BPM_DEFAULT);
+
+	const setBpmState = useCallback((value: number) => {
+		const clamped = Math.min(BPM_MAX, Math.max(BPM_MIN, value));
+		Tone.getTransport().bpm.value = clamped;
+		setBpm(clamped);
+	}, []);
 
 	const stop = useCallback(() => {
 		const transport = Tone.getTransport();
@@ -89,5 +102,5 @@ export const useScorePlayer = ({
 		setIsPlaying(true);
 	}, [state, stop, osmdRef.current?.cursor, containerRef.current]);
 
-	return { play, stop, isPlaying };
+	return { play, stop, isPlaying, bpm, setBpmState };
 };

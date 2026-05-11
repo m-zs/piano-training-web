@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { PlaybackBar } from "./PlaybackBar";
 import { useScorePlayer } from "./useScorePlayer";
 import { SCORE_VIEWER_LOAD_STATE, useScoreViewer } from "./useScoreViewer";
 
@@ -14,7 +15,7 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 		fileUrl,
 		buffer,
 	});
-	const { play, stop, isPlaying } = useScorePlayer({
+	const { play, stop, isPlaying, bpm, setBpmState } = useScorePlayer({
 		state,
 		osmdRef,
 		containerRef,
@@ -22,27 +23,7 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 	const ready = state === SCORE_VIEWER_LOAD_STATE.READY;
 
 	return (
-		<div className="relative w-full">
-			<div className="absolute right-0 top-0 z-10 flex gap-1">
-				<Button
-					type="button"
-					variant="secondary"
-					size="sm"
-					disabled={!ready || isPlaying}
-					onClick={() => void play()}
-				>
-					Play
-				</Button>
-				<Button
-					type="button"
-					variant="ghost"
-					size="sm"
-					disabled={!isPlaying}
-					onClick={stop}
-				>
-					Stop
-				</Button>
-			</div>
+		<div className="relative w-full pb-20">
 			{state === SCORE_VIEWER_LOAD_STATE.LOADING && (
 				<div className="flex items-center justify-center py-16">
 					<Spinner className="size-6" />
@@ -63,10 +44,18 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 			<div
 				ref={containerRef}
 				className={
-					state === SCORE_VIEWER_LOAD_STATE.READY
+					ready
 						? "osmd-score relative w-full"
 						: "osmd-score invisible h-0 overflow-hidden"
 				}
+			/>
+			<PlaybackBar
+				isPlaying={isPlaying}
+				ready={ready}
+				bpm={bpm}
+				onPlay={() => void play()}
+				onStop={stop}
+				onBpmChange={setBpmState}
 			/>
 		</div>
 	);
