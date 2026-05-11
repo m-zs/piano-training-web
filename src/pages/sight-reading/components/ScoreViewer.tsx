@@ -1,3 +1,4 @@
+import "./ScoreViewer.css";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";

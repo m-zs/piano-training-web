@@ -1,3 +1,4 @@
+import "./PlaybackBar.css";
 import {
 	ChevronLeft,
 	ChevronRight,
