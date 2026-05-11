@@ -9,7 +9,7 @@ export const syncCursorOverlay = (container: HTMLElement) => {
 	for (const img of container.querySelectorAll<HTMLImageElement>(
 		'img[id^="cursorImg-"]',
 	)) {
-		img.style.setProperty("display", "none", "important");
+		img.style.setProperty("visibility", "hidden", "important");
 
 		const s = img.style;
 		if (s.top) container.style.setProperty("--cursor-top", s.top);
