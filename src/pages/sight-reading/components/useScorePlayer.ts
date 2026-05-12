@@ -27,12 +27,6 @@ export const useScorePlayer = ({
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [bpm, setBpm] = useState(BPM_DEFAULT);
 
-	const setBpmState = useCallback((value: number) => {
-		const clamped = Math.min(BPM_MAX, Math.max(BPM_MIN, value));
-		Tone.getTransport().bpm.value = clamped;
-		setBpm(clamped);
-	}, []);
-
 	const stop = useCallback(() => {
 		const transport = Tone.getTransport();
 		transport.cancel();
@@ -59,8 +53,6 @@ export const useScorePlayer = ({
 		cursor.show();
 		if (containerRef.current) syncCursorOverlay(containerRef.current);
 
-		/** Default transport is 120 BPM; keep step length and note value aligned (one quarter per step). */
-		const stepSeconds = 60 / transport.bpm.value;
 		const noteLength: Tone.Unit.Time = "4n";
 
 		let nextTransportTime = 0;
@@ -85,7 +77,8 @@ export const useScorePlayer = ({
 
 			const chord = [...toneNotes];
 			const scheduleAt = nextTransportTime;
-			nextTransportTime += stepSeconds;
+			/** Read BPM fresh each step so mid-playback changes take effect immediately. */
+			nextTransportTime += 60 / transport.bpm.value;
 
 			transport.schedule((time) => {
 				if (chord.length > 0) {
@@ -101,6 +94,19 @@ export const useScorePlayer = ({
 		transport.start();
 		setIsPlaying(true);
 	}, [state, stop, osmdRef.current?.cursor, containerRef.current]);
+
+	const setBpmState = useCallback(
+		(value: number) => {
+			// If bpm is cahnged while playing, we need to restart the playback otherwise it's going to be bugged
+			const clamped = Math.min(BPM_MAX, Math.max(BPM_MIN, value));
+			Tone.getTransport().bpm.value = clamped;
+			setBpm(clamped);
+			if (Tone.getTransport().state === "started") {
+				void play();
+			}
+		},
+		[play],
+	);
 
 	return { play, stop, isPlaying, bpm, setBpmState };
 };
