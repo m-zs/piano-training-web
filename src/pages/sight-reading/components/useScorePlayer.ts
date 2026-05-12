@@ -1,6 +1,7 @@
 import type { OpenSheetMusicDisplay as OSMD } from "opensheetmusicdisplay";
+import * as OpenSheetMusicDisplay from "opensheetmusicdisplay";
 import type { RefObject } from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import type { LoadState } from "./useScoreViewer";
 import { SCORE_VIEWER_LOAD_STATE } from "./useScoreViewer";
@@ -17,6 +18,41 @@ const BPM_MIN = 40;
 const BPM_MAX = 240;
 
 export { BPM_DEFAULT, BPM_MIN, BPM_MAX };
+
+const walkCursorToTimestamp = (
+	cursor: OSMD["cursor"],
+	targetTimestamp: number,
+): void => {
+	cursor.reset();
+	cursor.show();
+	while (!cursor.iterator.EndReached) {
+		if (cursor.iterator.currentTimeStamp.RealValue >= targetTimestamp) break;
+		cursor.next();
+	}
+};
+
+const createClickHandler =
+	(osmd: OSMD, container: HTMLDivElement, play: () => Promise<void>) =>
+	(event: MouseEvent) => {
+		const cursor = osmd.cursor;
+		if (!cursor) return;
+
+		const graphicSheet = osmd.GraphicSheet;
+		const domPoint = new OpenSheetMusicDisplay.PointF2D(
+			event.clientX,
+			event.clientY,
+		);
+		const osmdPoint = graphicSheet.svgToOsmd(graphicSheet.domToSvg(domPoint));
+		const entry = graphicSheet.GetNearestStaffEntry(osmdPoint);
+		if (!entry) return;
+
+		walkCursorToTimestamp(cursor, entry.getAbsoluteTimestamp().RealValue);
+		syncCursorOverlay(container);
+
+		if (Tone.getTransport().state === "started") {
+			void play();
+		}
+	};
 
 export const useScorePlayer = ({
 	state,
@@ -107,6 +143,17 @@ export const useScorePlayer = ({
 		},
 		[play],
 	);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		const osmd = osmdRef.current;
+		if (state !== SCORE_VIEWER_LOAD_STATE.READY || !container || !osmd) return;
+
+		const handleClick = createClickHandler(osmd, container, play);
+
+		container.addEventListener("click", handleClick);
+		return () => container.removeEventListener("click", handleClick);
+	}, [state, play, containerRef.current, osmdRef.current]);
 
 	return { play, stop, isPlaying, bpm, setBpmState };
 };

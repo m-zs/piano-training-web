@@ -47,7 +47,7 @@ const ScoreViewer = ({ xml, fileUrl, buffer }: ScoreViewerProps) => {
 				ref={containerRef}
 				className={
 					ready
-						? "osmd-score relative w-full"
+						? "osmd-score relative w-full cursor-pointer"
 						: "osmd-score invisible h-0 overflow-hidden"
 				}
 			/>
