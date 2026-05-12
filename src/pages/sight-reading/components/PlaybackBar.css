@@ -35,3 +35,13 @@
 	box-shadow: 0 1px 4px rgba(23, 58, 64, 0.22);
 	cursor: pointer;
 }
+
+.bpm-input {
+	-moz-appearance: textfield;
+}
+
+.bpm-input::-webkit-inner-spin-button,
+.bpm-input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}

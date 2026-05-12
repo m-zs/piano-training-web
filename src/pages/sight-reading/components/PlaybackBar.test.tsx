@@ -67,10 +67,13 @@ describe("PlaybackBar", () => {
 	});
 
 	describe("BPM controls", () => {
-		it("displays the current BPM value", () => {
+		it("displays the current BPM value in the slider and the text input", () => {
 			renderBar({ bpm: 95 });
 
 			expect(screen.getByRole("slider", { name: /bpm/i })).toHaveValue("95");
+			expect(
+				screen.getByRole("spinbutton", { name: /bpm value/i }),
+			).toHaveValue(95);
 		});
 
 		it("calls onBpmChange with bpm − 5 when decrease is clicked", async () => {
@@ -121,6 +124,60 @@ describe("PlaybackBar", () => {
 			await user.click(screen.getByRole("button", { name: /decrease bpm/i }));
 
 			expect(onBpmChange).toHaveBeenCalledWith(BPM_MIN - 5);
+		});
+
+		describe("BPM text input", () => {
+			it("calls onBpmChange when Enter is pressed with a valid value", async () => {
+				const onBpmChange = vi.fn();
+				const user = userEvent.setup();
+				renderBar({ bpm: 120, onBpmChange });
+
+				const input = screen.getByRole("spinbutton", { name: /bpm value/i });
+				await user.clear(input);
+				await user.type(input, "100");
+				await user.keyboard("{Enter}");
+
+				expect(onBpmChange).toHaveBeenCalledWith(100);
+			});
+
+			it("calls onBpmChange when the input is blurred with a valid value", async () => {
+				const onBpmChange = vi.fn();
+				const user = userEvent.setup();
+				renderBar({ bpm: 120, onBpmChange });
+
+				const input = screen.getByRole("spinbutton", { name: /bpm value/i });
+				await user.clear(input);
+				await user.type(input, "80");
+				await user.tab();
+
+				expect(onBpmChange).toHaveBeenCalledWith(80);
+			});
+
+			it("resets to the current bpm when blurred with a non-numeric value", async () => {
+				const onBpmChange = vi.fn();
+				const user = userEvent.setup();
+				renderBar({ bpm: 120, onBpmChange });
+
+				const input = screen.getByRole("spinbutton", { name: /bpm value/i });
+				await user.clear(input);
+				await user.tab();
+
+				expect(onBpmChange).not.toHaveBeenCalled();
+				expect(input).toHaveValue(120);
+			});
+
+			it("syncs with bpm prop when changed externally via slider", () => {
+				const onBpmChange = vi.fn();
+				const { rerender } = renderBar({ bpm: 120, onBpmChange });
+
+				rerender(
+					<PlaybackBar {...defaults} bpm={150} onBpmChange={onBpmChange} />,
+				);
+
+				expect(
+					screen.getByRole("spinbutton", { name: /bpm value/i }),
+				).toHaveValue(150);
+			});
 		});
 	});
 

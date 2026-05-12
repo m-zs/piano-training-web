@@ -8,7 +8,7 @@ import {
 	Square,
 } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BPM_MAX, BPM_MIN } from "./useScorePlayer";
 
@@ -30,6 +30,21 @@ export const PlaybackBar = ({
 	onBpmChange,
 }: PlaybackBarProps) => {
 	const [collapsed, setCollapsed] = useState(false);
+	const [bpmInput, setBpmInput] = useState(String(bpm));
+
+	useEffect(() => {
+		setBpmInput(String(bpm));
+	}, [bpm]);
+
+	const commitBpm = () => {
+		const parsed = Number.parseInt(bpmInput, 10);
+		if (Number.isNaN(parsed)) {
+			setBpmInput(String(bpm));
+		} else {
+			onBpmChange(parsed);
+		}
+	};
+
 	const nudge = (delta: number) => onBpmChange(bpm + delta);
 
 	return (
@@ -113,9 +128,28 @@ export const PlaybackBar = ({
 							aria-label="BPM"
 							tabIndex={collapsed ? -1 : 0}
 						/>
-						<span className="text-[11px] font-semibold tabular-nums text-[var(--sea-ink-soft)]">
-							{bpm} <span className="font-normal opacity-70">BPM</span>
-						</span>
+						<div className="flex items-center gap-0.5">
+							<input
+								type="number"
+								min={BPM_MIN}
+								max={BPM_MAX}
+								value={bpmInput}
+								onChange={(e) => setBpmInput(e.target.value)}
+								onBlur={commitBpm}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										commitBpm();
+										e.currentTarget.blur();
+									}
+								}}
+								tabIndex={collapsed ? -1 : 0}
+								aria-label="BPM value"
+								className="bpm-input w-9 bg-transparent text-center text-[11px] font-semibold tabular-nums text-[var(--sea-ink-soft)] outline-none focus:underline cursor-text"
+							/>
+							<span className="text-[11px] font-normal opacity-70 text-[var(--sea-ink-soft)]">
+								BPM
+							</span>
+						</div>
 					</div>
 
 					<Button
