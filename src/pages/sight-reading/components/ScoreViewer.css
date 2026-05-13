@@ -1,0 +1,19 @@
+img[id^="cursorImg-"] {
+	pointer-events: none;
+	all: revert;
+	z-index: 5;
+}
+
+/* OSMD cursor overlay — rendered as ::after so Tailwind never touches the cursor <img>.
+   JS (syncCursorOverlay) hides the img and writes --cursor-* vars onto .osmd-score. */
+.osmd-score::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: var(--cursor-top, -9999px);
+	left: var(--cursor-left, 0px);
+	width: var(--cursor-w, 4px);
+	height: var(--cursor-h, 0px);
+	background-color: #0284c7;
+	opacity: 0.4;
+}

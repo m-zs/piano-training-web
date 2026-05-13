@@ -1,0 +1,47 @@
+.bpm-slider {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 4px;
+	border-radius: 9999px;
+	background: linear-gradient(
+		to right,
+		var(--lagoon) 0%,
+		var(--lagoon) calc((var(--bpm-pct, 50)) * 1%),
+		var(--line) calc((var(--bpm-pct, 50)) * 1%),
+		var(--line) 100%
+	);
+	outline: none;
+	cursor: pointer;
+}
+
+.bpm-slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--lagoon-deep);
+	border: 2px solid white;
+	box-shadow: 0 1px 4px rgba(23, 58, 64, 0.22);
+	cursor: pointer;
+}
+
+.bpm-slider::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--lagoon-deep);
+	border: 2px solid white;
+	box-shadow: 0 1px 4px rgba(23, 58, 64, 0.22);
+	cursor: pointer;
+}
+
+.bpm-input {
+	-moz-appearance: textfield;
+}
+
+.bpm-input::-webkit-inner-spin-button,
+.bpm-input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
